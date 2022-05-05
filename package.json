@@ -1,0 +1,23 @@
+{
+  "name": "acme-qcloud-scf",
+  "version": "1.2.0",
+  "description": "腾讯云云函数+acme 自动化",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prod": "export NODE_ENV=production && node index.js",
+    "start": "export NODE_ENV=development && node index-dev.js",
+    "dev": "export NODE_ENV=development && node index-dev.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "acme-client": "^4.2.5",
+    "axios": "^0.18.0",
+    "dnspod-api": "^1.0.12",
+    "extract-zip": "^2.0.1",
+    "file-base64": "^1.0.0",
+    "moment": "^2.22.2",
+    "tencentcloud-sdk-nodejs": "^4.0.333"
+  }
+}

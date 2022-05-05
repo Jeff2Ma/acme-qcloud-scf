@@ -1,0 +1,15 @@
+node_modules
+*.log
+*.gz
+.DS_Store
+build
+.git
+.idea
+dist
+config.js
+page/*.html
+tmp
+.nvm
+config.custom.js
+index-bak.js
+test
