@@ -5,16 +5,16 @@
  * @url https://github.com/Jeff2Ma/acme-qcloud-scf
  */
 
-let isLocal = true; // 是否是本地开发
+let isScfEnv = false; // 是否是云函数环境
 const isDebug = true; // 暂时都是这个模式
 const moment = require('moment');
 const acme = require('acme-client');
 const tencentcloud = require("tencentcloud-sdk-nodejs");
 const appName = '[acme-qcloud-scf]';
 
-acme.setLogger((message) => {
-    console.log(message);
-});
+// acme.setLogger((message) => {
+//     console.log(message);
+// });
 
 // 读取配置文件
 let config = {};
@@ -210,7 +210,14 @@ async function uploadCert2QcloudSSL(cert, key) {
 }
 
 async function initConfig(config, env) {
-    return Object.assign({}, config, env)
+    let envFormat = {};
+    if (env && typeof env === 'string') {
+        try {
+            envFormat = JSON.parse(env)
+        } catch (e) {
+        }
+    }
+    return Object.assign({}, config, envFormat)
 }
 
 async function updateCDNDomains(cert, key, CertificateId) {
@@ -240,21 +247,20 @@ async function updateCDNDomains(cert, key, CertificateId) {
     }))
 }
 
-const main_handler = async (event = {}, context = {environment: {}}, callback) => {
+const main_handler = async (event = {}, context = {}, callback) => {
     const environment = context?.environment || {}
-    // 云函数环境特有
-    if (environment?.SCF_NAMESPACE) {
-        log('context.environment上下文信息:', environment);
-        isLocal = false
-    }
-
+    log('environment:', environment);
     config = await initConfig(config, environment);
 
-    console.log('isLocal', isLocal)
+    // 云函数环境特有
+    if (config['SCF_NAMESPACE']) {
+        isScfEnv = true
+    }
+    log('isScfEnv', isScfEnv)
 
     /* Init client */
     const client = new acme.Client({
-        directoryUrl: (isLocal || isDebug) ? acme.directory.letsencrypt.staging : acme.directory.letsencrypt.production,
+        directoryUrl: (!isScfEnv || isDebug) ? acme.directory.letsencrypt.staging : acme.directory.letsencrypt.production,
         accountKey: await acme.forge.createPrivateKey(),
         termsOfServiceAgreed: true,
         challengePriority: ['dns-01'],
