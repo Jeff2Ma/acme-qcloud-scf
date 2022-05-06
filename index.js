@@ -172,9 +172,9 @@ async function removeOldDNSRecords(from = '') {
             log(`Record.Remove Success:${item.id}`, res.status)
         }))
 
-        if (from === 'firstTime') {
-            log('延迟 20s，预防 dns 缓存因素影响');
-            await sleep(10);
+        if (from && from === 'firstTime') {
+            log('延迟 15s，预防 dns 缓存因素影响');
+            await sleep(15);
         }
 
         return {}
