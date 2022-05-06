@@ -249,7 +249,6 @@ async function updateCDNDomains(cert, key, CertificateId) {
 
 const main_handler = async (event = {}, context = {}, callback) => {
     const environment = context?.environment || {}
-    log('environment:', environment);
     config = await initConfig(config, environment);
 
     // 云函数环境特有
@@ -322,7 +321,7 @@ const main_handler = async (event = {}, context = {}, callback) => {
             } finally {
                 /* Clean up challenge response */
                 try {
-                    await challengeRemoveFn(authz, challenge, keyAuthorization);
+                   // await challengeRemoveFn(authz, challenge, keyAuthorization);
                 } catch (e) {
                     /**
                      * Catch errors thrown by challengeRemoveFn() so the order can
