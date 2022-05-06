@@ -12,9 +12,9 @@ const acme = require('acme-client');
 const tencentcloud = require("tencentcloud-sdk-nodejs");
 const appName = '[acme-qcloud-scf]';
 
-// acme.setLogger((message) => {
-//     console.log(message);
-// });
+acme.setLogger((message) => {
+    console.log(message);
+});
 
 // 读取配置文件
 let config = {};
@@ -319,6 +319,9 @@ const main_handler = async (event = {}, context = {}, callback) => {
             try {
                 /* Satisfy challenge */
                 await challengeCreateFn(authz, challenge, keyAuthorization);
+
+                log('延迟 15s，预防 dns 缓存因素影响');
+                await sleep(15);
 
                 /* Verify that challenge is satisfied */
                 await client.verifyChallenge(authz, challenge);
