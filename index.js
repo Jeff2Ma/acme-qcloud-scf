@@ -78,7 +78,7 @@ async function challengeCreateFn(authz, challenge, keyAuthorization) {
     const recordValue = keyAuthorization;
     log(`Creating TXT record for ${authz.identifier.value}: ${dnsRecord}`);
     // 清空所有的 DNS 记录
-    await removeOldDNSRecords();
+    await removeOldDNSRecords('firstTime');
     const createRes = await dnspodApi.do({
         action: 'Record.Create',
         params: {
@@ -134,7 +134,7 @@ async function challengeRemoveFn(authz, challenge, keyAuthorization) {
     }
 }
 
-async function removeOldDNSRecords() {
+async function removeOldDNSRecords(from = '') {
     // https://docs.dnspod.cn/api/modify-records/
     const recordListData = await dnspodApi.do({
         action: 'Record.List',
@@ -156,7 +156,7 @@ async function removeOldDNSRecords() {
     const records = recordListData?.records;
     if (records.length) {
         log('提示：检测到有旧的 dns 记录，尝试全部删除');
-        return await Promise.all(records.map(async item => {
+        await Promise.all(records.map(async item => {
             const res = await dnspodApi.do({
                 action: 'Record.Remove',
                 params: {
@@ -171,11 +171,22 @@ async function removeOldDNSRecords() {
             })
             log(`Record.Remove Success:${item.id}`, res.status)
         }))
+
+        if (from === 'firstTime') {
+            log('延迟 20s，预防 dns 缓存因素影响');
+            await sleep(10);
+        }
+
+        return {}
     }
     return Promise.resolve({
         empty: true,
         length: 0,
     });
+}
+
+async function sleep(s) {
+    return new Promise(resolve => setTimeout(resolve, s * 1000));
 }
 
 async function uploadCert2QcloudSSL(cert, key) {
