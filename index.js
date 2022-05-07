@@ -146,7 +146,7 @@ async function removeOldDNSRecords(from = '') {
         log(e)
         return {}
     })
-    log('challengeCreateFn:recordListData', recordListData.status);
+    log('removeOldDNSRecords:recordListData', recordListData.status);
     if (recordListData?.status?.code + '' === '10') {
         return Promise.resolve({
             empty: true,
