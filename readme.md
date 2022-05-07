@@ -6,11 +6,11 @@
 
 - 通过 ACME 协议 从 letsencrypt 生成免费的通配符证书。
 
-- 部署在腾讯云·云函数（Serverless Cloud Function，SCF），定时运行更新证书。
+- 程序部署在腾讯云·云函数（Serverless Cloud Function，SCF），定时运行更新证书。
 
 - 证书生成后自动上传到腾讯云 SSL 托管平台并绑定到相关 CDN 加速域名。
 
-- 服务端亦可一键更新 SSL 证书文件并生效。
+- 服务端亦可一键更新 SSL 证书文件并重启 Nginx 等生效。
 
 > 📢 注：自动化颁发证书需要域名托管到 腾讯云 或 DNSPod 上以通过 SDK 方式进行 ACME 的 DNS 验证。
 
