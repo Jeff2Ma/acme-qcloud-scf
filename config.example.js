@@ -1,4 +1,5 @@
 module.exports = {
+    isDebug: true,
     email: 'test@example.com',  // 你的邮箱
     domain: 'example.com', // 需要生成证书的根域名，最终生成通配符证书
     qcloudSecretId: '', // 腾讯云 SecretId, https://console.cloud.tencent.com/cam/capi

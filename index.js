@@ -6,10 +6,10 @@
  */
 
 let isScfEnv = false; // 是否是云函数环境
-const isDebug = true; // 暂时都是这个模式
 const moment = require('moment');
 const acme = require('acme-client');
 const tencentcloud = require("tencentcloud-sdk-nodejs");
+const axios = require('axios');
 const appName = '[acme-qcloud-scf]';
 
 acme.setLogger((message) => {
@@ -258,6 +258,29 @@ async function updateCDNDomains(cert, key, CertificateId) {
     }))
 }
 
+async function postWeComRobotMsg(options) {
+    const content = options?.content || ''
+    if (!content) return '没有消息要发送';
+    const postData = {
+        "msgtype": "text",
+        "text": {
+            content: (!isScfEnv ? '[本地调试发送]' : '') + content
+        }, "mentioned_list": ["@all"]
+    };
+    return axios.post(config.wecomWebHook, postData)
+        .then(function (res) {
+            console.log(res.data);
+            return res.data;
+        })
+        .catch(function (error) {
+            console.log(error);
+            return 'st wrong when post qywx robot api';
+        })
+        .then(function (result) {
+            return '发送企业微信机器人成功:' + JSON.stringify(result) + 'H:' + moment().utcOffset(8).format('kk');
+        });
+}
+
 const main_handler = async (event = {}, context = {}, callback) => {
     const environment = context?.environment || {}
     config = await initConfig(config, environment);
@@ -270,7 +293,7 @@ const main_handler = async (event = {}, context = {}, callback) => {
 
     /* Init client */
     const client = new acme.Client({
-        directoryUrl: (!isScfEnv || isDebug) ? acme.directory.letsencrypt.staging : acme.directory.letsencrypt.production,
+        directoryUrl: (!isScfEnv || config.isDebug) ? acme.directory.letsencrypt.staging : acme.directory.letsencrypt.production,
         accountKey: await acme.forge.createPrivateKey(),
         termsOfServiceAgreed: true,
         challengePriority: ['dns-01'],
@@ -380,6 +403,9 @@ const main_handler = async (event = {}, context = {}, callback) => {
         await updateCDNDomains(cert, key, CertificateId)
     } catch (e) {
         log('Finalize order error: ', e)
+        await postWeComRobotMsg({
+            content: `生成证书失败${JSON.parse(JSON.stringify(e))}`
+        })
     }
     // 清空多余的 dnsPod 记录
     await removeOldDNSRecords()
