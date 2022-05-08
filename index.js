@@ -293,7 +293,7 @@ const main_handler = async (event = {}, context = {}, callback) => {
 
     /* Init client */
     const client = new acme.Client({
-        directoryUrl: (!isScfEnv || config.isDebug) ? acme.directory.letsencrypt.staging : acme.directory.letsencrypt.production,
+        directoryUrl: (!isScfEnv || +(config.isDebug)) ? acme.directory.letsencrypt.staging : acme.directory.letsencrypt.production,
         accountKey: await acme.forge.createPrivateKey(),
         termsOfServiceAgreed: true,
         challengePriority: ['dns-01'],
