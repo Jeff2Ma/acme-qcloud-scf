@@ -52,7 +52,6 @@
 0 0 4 * * SAT *
 ```
 
-
 ## 相关配置项说明
 
 1. 腾讯云 secretId, secretKey 在[腾讯云控制台-访问管理-访问密钥](https://console.cloud.tencent.com/cam/capi) 进行获取或设置。建议通过子账号的形式进行云 API 调用权限授权。
@@ -65,6 +64,11 @@
 ## 服务端证书更新指引
 
 同样上传一份项目文件到服务端合适位置，参考`download-cert.js`文件并对相关路径进行改写。建议绑定到 `crontab` 定时执行。
+
+参考写法：
+```shell
+0 0 5 * * SAT * 'cd /home/acme-qcloud-scf/ && /usr/bin/node /home/acme-qcloud-scf/download-cert.js' >/dev/null &
+```
 
 > 📢 注：服务端需要支持 Node.js 环境。
 

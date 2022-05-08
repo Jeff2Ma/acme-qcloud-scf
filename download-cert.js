@@ -21,10 +21,8 @@ try {
     config = require('./config.example.js')
 }
 
-const outputDir = path.resolve(process.cwd(), 'dist', config.domain)
-const outputPath = path.resolve(outputDir, '../', `${config.domain}.zip`)
 
-async function base642zipPromise(Content) {
+async function base642zipPromise(Content, outputPath) {
     return new Promise((resolve, reject) => {
         base64Client.decode(Content, outputPath, function (err, output) {
             console.log(err, output);
@@ -34,8 +32,10 @@ async function base642zipPromise(Content) {
     });
 }
 
-
-(async () => {
+async function downloadCertFile(domain) {
+    console.log(`正在下载域名为${domain}的证书...`)
+    const outputDir = path.resolve(process.cwd(), 'dist', domain)
+    const outputPath = path.resolve(outputDir, '../', `${domain}.zip`)
     const sslClient = new tencentcloud.ssl.v20191205.Client({
         credential: {
             secretId: config.qcloudSecretId,
@@ -53,7 +53,7 @@ async function base642zipPromise(Content) {
     })
 
     const {Certificates} = await sslClient.DescribeCertificates({})
-    const target = Certificates.find(item => item.Alias === config.domain);
+    const target = Certificates.find(item => item.Alias === domain);
     if (!target) {
         console.log('没有找到目标 Certificate')
         return {};
@@ -64,24 +64,36 @@ async function base642zipPromise(Content) {
 
     if (Content) {
         try {
-            await base642zipPromise(Content)
+            await base642zipPromise(Content, outputPath)
             await extract(outputPath, {dir: outputDir})
             console.log('Extraction complete');
-            exec(afterDoneShellScript, (error, stdout, stderr) => {
-                if (error) {
-                    console.log(`error: ${error.message}`);
-                    return;
-                }
-                if (stderr) {
-                    console.log(`stderr: ${stderr}`);
-                    return;
-                }
-                console.log(`stdout: ${stdout}`);
-            });
         } catch (err) {
             // handle any errors
             console.log(err)
         }
     }
     return {Content}
+}
+
+
+(async () => {
+    try{
+        await Promise.all(config.downloadDomainList.map(async item=>{
+            await downloadCertFile(item)
+        }))
+
+        exec(afterDoneShellScript, (error, stdout, stderr) => {
+            if (error) {
+                console.log(`error: ${error.message}`);
+                return;
+            }
+            if (stderr) {
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+        });
+    } catch (e) {
+        console.error(e)
+    }
 })();
