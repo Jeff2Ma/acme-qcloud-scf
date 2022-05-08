@@ -9,6 +9,9 @@ const tencentcloud = require("tencentcloud-sdk-nodejs")
 const base64Client = require('file-base64');
 const path = require('path');
 const extract = require('extract-zip')
+const {exec} = require("child_process");
+
+const afterDoneShellScript = `lnmp nginx restart`
 
 // 读取配置文件
 let config = {};
@@ -35,8 +38,8 @@ async function base642zipPromise(Content) {
 (async () => {
     const sslClient = new tencentcloud.ssl.v20191205.Client({
         credential: {
-            secretId: config.qcloud.secretId,
-            secretKey: config.qcloud.secretKey,
+            secretId: config.qcloudSecretId,
+            secretKey: config.qcloudSecretKey,
         },
         // region: "ap-shanghai",
         profile: {
@@ -63,7 +66,18 @@ async function base642zipPromise(Content) {
         try {
             await base642zipPromise(Content)
             await extract(outputPath, {dir: outputDir})
-            console.log('Extraction complete')
+            console.log('Extraction complete');
+            exec(afterDoneShellScript, (error, stdout, stderr) => {
+                if (error) {
+                    console.log(`error: ${error.message}`);
+                    return;
+                }
+                if (stderr) {
+                    console.log(`stderr: ${stderr}`);
+                    return;
+                }
+                console.log(`stdout: ${stdout}`);
+            });
         } catch (err) {
             // handle any errors
             console.log(err)
