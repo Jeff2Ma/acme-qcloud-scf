@@ -67,7 +67,7 @@
 
 参考写法：
 ```shell
-0 0 5 * * SAT * 'cd /home/acme-qcloud-scf/ && /usr/bin/node /home/acme-qcloud-scf/download-cert.js' >/dev/null &
+0 0 5 * * SAT * /usr/bin/node /home/xxx/acme-qcloud-scf/download-cert.js >/dev/null &
 ```
 
 > 📢 注：服务端需要支持 Node.js 环境。
