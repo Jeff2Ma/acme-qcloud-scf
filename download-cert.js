@@ -34,7 +34,7 @@ async function base642zipPromise(Content, outputPath) {
 
 async function downloadCertFile(domain) {
     console.log(`正在下载域名为${domain}的证书...`)
-    const outputDir = path.resolve(process.cwd(), 'dist', domain)
+    const outputDir = path.resolve(__dirname, 'dist', domain)
     const outputPath = path.resolve(outputDir, '../', `${domain}.zip`)
     const sslClient = new tencentcloud.ssl.v20191205.Client({
         credential: {
