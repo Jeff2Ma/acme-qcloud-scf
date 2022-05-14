@@ -63,11 +63,18 @@
 
 ## 服务端证书更新指引
 
-同样上传一份项目文件到服务端合适位置，参考`download-cert.js`文件并对相关路径进行改写。建议绑定到 `crontab` 定时执行。
+同样上传一份项目文件到服务端合适位置，参考`download-cert.js`， `download-cert.sh`文件并对相关路径进行改写。
 
-参考写法：
 ```shell
-0 0 5 * * SAT * /usr/bin/node /home/xxx/acme-qcloud-scf/download-cert.js >/dev/null &
+chmod +x /home/acme-qcloud-scf/download-cert.sh
+```
+
+建议绑定到 `crontab` 定时执行。
+
+参考写法（每周六 5：30 启动运行）：
+
+```shell
+30 5 * * SAT /home/acme-qcloud-scf/download-cert.sh
 ```
 
 > 📢 注：服务端需要支持 Node.js 环境。
