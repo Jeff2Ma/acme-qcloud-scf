@@ -1,6 +1,6 @@
 # acme-qcloud-scf
 
-基于腾讯云·云函数的 ACME SSL 证书自动更新（Node.js 版本）。
+借助腾讯云·云函数实现的 ACME Let’s Encrypt SSL 证书自动更新（Node.js 版本）。
 
 ## 功能概览
 
